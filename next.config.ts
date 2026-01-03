@@ -1,6 +1,11 @@
 import type { NextConfig } from 'next';
 import createMDX from '@next/mdx';
 
+// npm run dev : development 환경
+// npm run build -> npm run start : production 환경
+console.log(process.env.NODE_ENV);
+console.log(process.env.ENV_NAME);
+
 const nextConfig: NextConfig = {
   typescript: {
     // 경고: 타입 에러가 있어도 프로덕션 빌드를 허용
