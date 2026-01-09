@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/layouts/Header';
 import Footer from '@/components/layouts/Footer';
+import Providers from './providers';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -25,19 +26,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* min-h-screen으로 전체 높이 보장, grid로 3개 영역 분할 */}
-        <div className="flex min-h-screen flex-col">
-          {/* Header 영역 */}
-          <Header />
+        <Providers>
+          {/* min-h-screen으로 전체 높이 보장, grid로 3개 영역 분할 */}
+          <div className="flex min-h-screen flex-col">
+            {/* Header 영역 */}
+            <Header />
 
-          {/* Main 영역 */}
-          <main className="flex-1">{children}</main>
+            {/* Main 영역 */}
+            <main className="flex-1">{children}</main>
 
-          {/* Footer 영역 */}
-          <Footer />
-        </div>
+            {/* Footer 영역 */}
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );

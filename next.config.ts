@@ -3,8 +3,8 @@ import createMDX from '@next/mdx';
 
 // npm run dev : development 환경
 // npm run build -> npm run start : production 환경
-console.log(process.env.NODE_ENV);
-console.log(process.env.ENV_NAME);
+// console.log(process.env.NODE_ENV);
+// console.log(process.env.ENV_NAME);
 
 const nextConfig: NextConfig = {
   typescript: {
@@ -21,6 +21,9 @@ const nextConfig: NextConfig = {
       },
       {
         hostname: 'prod-files-secure.s3.us-west-2.amazonaws.com',
+      },
+      {
+        hostname: 'www.notion.so',
       },
     ],
   },

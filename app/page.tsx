@@ -1,60 +1,41 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import Link from 'next/link';
-import { PostCard } from '@/components/features/blog/PostCard';
-import TagSection from './_components/TagSection';
-import ProfileSection from './_components/ProfileSection';
-import { getPublishedPosts, getTags } from '@/lib/notion';
-
+import ProfileSection from '@/app/_components/ProfileSection';
+import { getTags, getPublishedPosts } from '@/lib/notion';
+import HeaderSection from '@/app/_components/HeaderSection';
+import PostListSuspense from '@/components/features/blog/PostListSuspense';
+import { Suspense } from 'react';
+import TagSectionClient from '@/app/_components/TagSection.client';
+import PostListSkeleton from '@/components/features/blog/PostListSkeleton';
+import TagSectionSkeleton from '@/app/_components/TagSectionSkeleton';
 interface HomeProps {
-  searchParams: Promise<{ tag?: string }>;
+  searchParams: Promise<{ tag?: string; sort?: string }>;
 }
 
 export default async function Home({ searchParams }: HomeProps) {
-  const { tag } = await searchParams;
+  const { tag, sort } = await searchParams;
   const selectedTag = tag || '전체';
-  const [posts, tags] = await Promise.all([getPublishedPosts(selectedTag), getTags()]);
+  const selectedSort = sort || 'latest';
 
+  const tags = getTags();
+  const postsPromise = getPublishedPosts({ tag: selectedTag, sort: selectedSort });
   return (
     <div className="container py-8">
-      <div className="grid grid-cols-[200px_1fr_220px] gap-6">
-        <aside>
-          <TagSection tags={tags} selectedTag={selectedTag} />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-[200px_1fr_220px]">
+        {/* 좌측 사이드바 */}
+        <aside className="order-2 md:order-none">
+          <Suspense fallback={<TagSectionSkeleton />}>
+            <TagSectionClient tags={tags} selectedTag={selectedTag} />
+          </Suspense>
         </aside>
-
-        <div className="space-y-8">
+        <div className="order-3 space-y-8 md:order-none">
           {/* 섹션 제목 */}
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-bold tracking-tight">
-              {selectedTag === '전체' ? '블로그 목록' : `${selectedTag} 관련 글`}
-            </h2>
-            <Select defaultValue="latest">
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="정렬 방식 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="latest">최신순</SelectItem>
-                <SelectItem value="oldest">오래된순</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
+          <HeaderSection selectedTag={selectedTag} />
           {/* 블로그 카드 그리드 */}
-          <div className="grid gap-4">
-            {posts.map((post) => (
-              <Link href={`/blog/${post.slug}`} key={post.id}>
-                <PostCard post={post} />
-              </Link>
-            ))}
-          </div>
+          <Suspense fallback={<PostListSkeleton />}>
+            <PostListSuspense postsPromise={postsPromise} />
+          </Suspense>
         </div>
         {/* 우측 사이드바 */}
-        <aside>
+        <aside className="order-1 flex flex-col gap-6 md:order-none">
           <ProfileSection />
         </aside>
       </div>
